@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="460" viewBox="0 0 900 460" role="img" aria-labelledby="title desc">
+<title id="title">Weekly ping acceptance by responder</title><desc id="desc">Farlight drops to zero percent after release and receives no pings in the last week. Cindermark and Sgt. Falkirk stay near seventy percent.</desc>
+<rect width="900" height="460" fill="#fff"/><g font-family="Segoe UI, sans-serif" fill="#192639">
+<text x="45" y="42" font-size="25" font-weight="700">Weekly ping acceptance</text>
+<text x="46" y="75" fill="#ac3829" font-size="16" font-weight="600">● Farlight</text>
+<text x="200" y="75" fill="#175ea5" font-size="16" font-weight="600">● Cindermark</text>
+<text x="354" y="75" fill="#237650" font-size="16" font-weight="600">● Sgt. Falkirk</text>
+<path d="M 85 375 H 823" stroke="#dce3ea"/><text x="73" y="380" text-anchor="end" font-size="13">0%</text>
+<path d="M 85 310 H 823" stroke="#dce3ea"/><text x="73" y="315" text-anchor="end" font-size="13">25%</text>
+<path d="M 85 245 H 823" stroke="#dce3ea"/><text x="73" y="250" text-anchor="end" font-size="13">50%</text>
+<path d="M 85 180 H 823" stroke="#dce3ea"/><text x="73" y="185" text-anchor="end" font-size="13">75%</text>
+<path d="M 85 115 H 823" stroke="#dce3ea"/><text x="73" y="120" text-anchor="end" font-size="13">100%</text>
+<path d="M 577 110 V 375" stroke="#788698" stroke-dasharray="5 5"/><text x="587" y="107" font-size="13">4.2 shipped 12 Aug</text>
+<text x="85" y="402" text-anchor="middle" font-size="13">29 Jun</text>
+<text x="167" y="402" text-anchor="middle" font-size="13">6 Jul</text>
+<text x="249" y="402" text-anchor="middle" font-size="13">13 Jul</text>
+<text x="331" y="402" text-anchor="middle" font-size="13">20 Jul</text>
+<text x="413" y="402" text-anchor="middle" font-size="13">27 Jul</text>
+<text x="495" y="402" text-anchor="middle" font-size="13">3 Aug</text>
+<text x="577" y="402" text-anchor="middle" font-size="13">10 Aug</text>
+<text x="659" y="402" text-anchor="middle" font-size="13">17 Aug</text>
+<text x="741" y="402" text-anchor="middle" font-size="13">24 Aug</text>
+<text x="823" y="402" text-anchor="middle" font-size="13">31 Aug</text>
+<polyline points="85,180 167,180 249,185.9090909090909 331,180 413,175 495,201.66666666666669 577,271 659,375 741,375" fill="none" stroke="#ac3829" stroke-width="3" />
+<circle cx="85" cy="180" r="4" fill="#ac3829"/>
+<circle cx="167" cy="180" r="4" fill="#ac3829"/>
+<circle cx="249" cy="185.9090909090909" r="4" fill="#ac3829"/>
+<circle cx="331" cy="180" r="4" fill="#ac3829"/>
+<circle cx="413" cy="175" r="4" fill="#ac3829"/>
+<circle cx="495" cy="201.66666666666669" r="4" fill="#ac3829"/>
+<circle cx="577" cy="271" r="4" fill="#ac3829"/>
+<circle cx="659" cy="375" r="4" fill="#ac3829"/>
+<circle cx="741" cy="375" r="4" fill="#ac3829"/>
+<polyline points="85,172.77777777777777 167,143.8888888888889 249,180 331,193 413,172.77777777777777 495,143.8888888888889 577,219 659,185.9090909090909 741,201.66666666666669 823,180" fill="none" stroke="#175ea5" stroke-width="3" />
+<circle cx="85" cy="172.77777777777777" r="4" fill="#175ea5"/>
+<circle cx="167" cy="143.8888888888889" r="4" fill="#175ea5"/>
+<circle cx="249" cy="180" r="4" fill="#175ea5"/>
+<circle cx="331" cy="193" r="4" fill="#175ea5"/>
+<circle cx="413" cy="172.77777777777777" r="4" fill="#175ea5"/>
+<circle cx="495" cy="143.8888888888889" r="4" fill="#175ea5"/>
+<circle cx="577" cy="219" r="4" fill="#175ea5"/>
+<circle cx="659" cy="185.9090909090909" r="4" fill="#175ea5"/>
+<circle cx="741" cy="201.66666666666669" r="4" fill="#175ea5"/>
+<circle cx="823" cy="180" r="4" fill="#175ea5"/>
+<polyline points="85,141 167,167 249,185.9090909090909 331,167 413,172.77777777777777 495,167 577,209.54545454545456 659,195 741,184.33333333333334 823,196.25" fill="none" stroke="#237650" stroke-width="3" stroke-dasharray="7 4"/>
+<circle cx="85" cy="141" r="4" fill="#237650"/>
+<circle cx="167" cy="167" r="4" fill="#237650"/>
+<circle cx="249" cy="185.9090909090909" r="4" fill="#237650"/>
+<circle cx="331" cy="167" r="4" fill="#237650"/>
+<circle cx="413" cy="172.77777777777777" r="4" fill="#237650"/>
+<circle cx="495" cy="167" r="4" fill="#237650"/>
+<circle cx="577" cy="209.54545454545456" r="4" fill="#237650"/>
+<circle cx="659" cy="195" r="4" fill="#237650"/>
+<circle cx="741" cy="184.33333333333334" r="4" fill="#237650"/>
+<circle cx="823" cy="196.25" r="4" fill="#237650"/>
+<text x="823" y="358" text-anchor="middle" fill="#ac3829" font-size="13">No pings</text><text x="85" y="437" font-size="13">Weeks start Monday · Acceptance = pings taken ÷ pings sent</text></g></svg>

@@ -61,3 +61,9 @@ Sources: Rook wiki **Company** section (product pages, glossary, team directory,
 - Excluding release day: 40 tickets before 12 August across 44 days versus 105 after across 26 days, about 4.4x the daily rate; timing alone does not establish cause. Filter complaints shifted from requests to remember settings toward incorrect or reset saved settings.
 - No major high-volume ticket theme was entirely absent from interviews; interviews emphasized readability and dark mode more. Halloran praised improved maintenance scheduling, while four tickets reported bad scheduling or late reminders.
 - Reviewed sources report missed opportunities, uncertainty and uneven workloads, but no deaths or confirmed incident harm. Still open: causes of quiet periods, supporting evidence and KPI target for the shorter timeout; validate against ping data before drawing causal conclusions.
+
+- Module 3 reconciled 1,696 ping records to responder-week rows. In equal 21-day windows excluding release day, pings taken fell from 407/525 (77.5%) to 301/482 (62.4%), while misses rose from 12 to 91.
+- Unaccepted callouts rose from 23/430 to 44/345. The additional 21 all involved a miss. Callouts sent to multiple responders rose from 88/430 to 115/345.
+- The four hardest-hit responders fell from 147 to 49 pings across equal windows. Farlight went from 11–13 pings per full week to 3, 1 and 0 after release. Linda’s tickets match the gaps in sends.
+- In Eastgate, volume fell from 62 to 45 callouts. Meteor Mite’s first-ping share fell from 24/62 to 6/45, while The Gale’s rose from 27/62 to 31/45.
+- A code preview confirmed that a missed ping and a decline both reduce acceptance history by 0.12, with no automatic recovery. Combined with the 60-second timeout and changed weights, that can reduce future offers. Ping records lack candidate ranks, travel times and delivery timestamps, so the separate effects remain open.
