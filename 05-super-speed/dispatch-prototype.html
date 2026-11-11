@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rook Dispatch · Callout prototype</title>
+  <style>
+    :root {
+      --ink: #202020;
+      --paper: #ffffff;
+      --canvas: #f2f0ed;
+      --line: #c9c4bf;
+      --red: #c91224;
+      --ember: #ffb35c;
+      --phone: #20252e;
+      --phone-card: #303945;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); font: 17px/1.5 "Segoe UI", sans-serif; }
+    main { width: min(1080px, 100% - 40px); margin: 42px auto; }
+    h1 { font-size: clamp(30px, 5vw, 56px); line-height: 1.06; margin: 12px 0; letter-spacing: -.045em; }
+    h2, h3, p { margin: 0 0 12px; }
+    header { margin-bottom: 26px; padding: 20px 24px; background: var(--ink); color: var(--paper); border-top: 6px solid var(--red); }
+    header p { margin-bottom: 0; }
+    .label { color: var(--red); font-size: .82rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+    header .label, .phone .label { color: var(--ember); }
+    .grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+    .panel { min-height: 310px; padding: 24px; border-radius: 18px; background: var(--paper); border: 1px solid var(--line); }
+    .phone { background: var(--phone); color: var(--paper); border-color: var(--phone); }
+    .phone-body { background: var(--phone-card); padding: 18px; border-radius: 12px; }
+    ol { padding-left: 26px; margin: 18px 0 0; }
+    li { padding: 7px 0; }
+    .scores { margin: 18px 0; padding: 20px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+    .table-scroll { overflow-x: auto; }
+    .scores table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+    .scores th, .scores td { padding: 7px 5px; border-bottom: 1px solid var(--line); text-align: left; }
+    .scores td:last-child { font-weight: 700; }
+    .scores p { margin: 10px 0 0; font-size: .9rem; }
+    .avatar { width: 42px; height: 42px; object-fit: cover; border-radius: 50%; border: 2px solid var(--line); flex-shrink: 0; }
+    .identity { display: flex; align-items: center; gap: 12px; }
+    h2.identity .avatar { width: 64px; height: 64px; }
+    .view-switch { display: flex; gap: 8px; margin-bottom: 18px; }
+    .view-switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+    .grid.responder-view { grid-template-columns: minmax(0, 420px); justify-content: center; }
+    .phone-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .phone-score { padding: 10px 12px; background: #233e60; color: #eef6ff; border-left: 4px solid #8bc4ff; border-radius: 6px; font-weight: 650; }
+    .responder-identity { display: flex; align-items: center; gap: 10px; min-width: 180px; }
+    button { font: inherit; font-weight: 700; padding: 10px 16px; border-radius: 9px; cursor: pointer; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+    #next, button.primary { background: var(--red); border-color: var(--red); color: var(--paper); }
+    button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+    .phone button:focus-visible { outline-color: var(--ember); }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+    details { padding: 14px 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+    .score-comparison { min-width: 205px; padding: 6px 8px; }
+    .score-comparison summary { white-space: nowrap; }
+    .score-comparison figure { margin: 10px 0 0; }
+    .score-comparison figcaption { margin-bottom: 4px; }
+    .comparison-bar { display: grid; grid-template-columns: 58px 1fr 44px; align-items: center; gap: 6px; margin: 4px 0; font-size: .8rem; }
+    .bar-track { height: 9px; background: var(--canvas); border-radius: 4px; overflow: hidden; }
+    .bar-fill { display: block; height: 100%; background: #56677b; }
+    .bar-fill.proposal { background: var(--red); }
+    .note-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 18px; padding: 0; list-style: none; }
+    .note-flow li { display: flex; align-items: center; gap: 8px; padding: 0; font-size: .9rem; }
+    .note-flow .step { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--canvas); }
+    .note-flow .score-step { border-color: #8bc4ff; background: #233e60; color: #eef6ff; font-weight: 650; }
+    summary { cursor: pointer; font-weight: 700; }
+    details p { margin: 12px 0 0; }
+    [hidden] { display: none !important; }
+    @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } .panel { min-height: 0; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="label">Rook Dispatch · Prototype for Helen Achebe</div>
+      <h1>After Farlight misses a callout</h1>
+      <p>In this proposed Dispatch flow, an expired offer leaves the responder’s acceptance score unchanged.</p>
+    </header>
+
+    <nav class="view-switch" aria-label="Demo views">
+      <button id="handler-view" type="button" aria-pressed="true">Handler Demo</button>
+      <button id="responder-view" type="button" aria-pressed="false">Responder View</button>
+    </nav>
+
+    <div class="grid" id="demo-grid">
+      <section class="panel" id="handler-panel" aria-labelledby="console-heading">
+        <div class="label">Handler console</div>
+        <h2 id="console-heading" class="identity"><img class="avatar" src="avatars/kip.png" alt="">Kip</h2>
+        <div aria-live="polite">
+          <h3 id="callout"></h3>
+          <ol id="timeline"></ol>
+        </div>
+        <div id="response-controls" class="controls" role="group" aria-label="Simulate Farlight’s response" hidden>
+          <p style="flex-basis: 100%; margin: 0">Simulate Farlight’s response</p>
+          <button class="primary" id="accept" type="button">Accept</button>
+          <button id="miss" type="button">Missed (60 seconds)</button>
+          <button id="decline" type="button">Decline</button>
+        </div>
+      </section>
+      <section class="panel phone" aria-labelledby="phone-heading">
+        <div class="label">Responder phone</div>
+        <h2 id="phone-heading" class="identity"><img class="avatar" src="avatars/farlight.png" alt="">Farlight</h2>
+        <div class="phone-body">
+          <div aria-live="polite">
+            <h3 id="phone-title" tabindex="-1"></h3>
+            <p id="phone-message"></p>
+            <p id="score-summary" class="phone-score"></p>
+          </div>
+          <div class="phone-actions" id="phone-actions" hidden>
+            <button id="phone-accept" class="primary" type="button">Accept</button>
+            <button id="phone-decline" type="button">Decline</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="controls" id="demo-controls">
+      <button id="next" type="button" hidden></button>
+      <button id="no-backup" type="button" hidden>Simulate no backup for callout 1</button>
+      <button id="restart" type="button">Restart demo</button>
+    </div>
+
+    <section class="scores" id="roster-panel" aria-labelledby="scores-heading">
+      <h2 id="scores-heading">Uptown · Full responder roster</h2>
+      <p>For each new callout after the first, this simulation makes all 16 rostered responders available again. Travel time, skills and acceptance scores are simulated.</p>
+      <p>Total = 60% proximity + 15% skills match + 25% acceptance history. Rows show how the current scores would rank responders for the next callout. Expand a comparison to see how 4.2 and the proposal score the same simulated offers on a 0–1 scale.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-labelledby="scores-heading">
+        <table aria-labelledby="scores-heading">
+          <thead>
+            <tr><th scope="col">Rank</th><th scope="col">Responder</th><th scope="col">Usual area</th><th scope="col">Proximity</th><th scope="col">Skills match</th><th scope="col">Acceptance score</th><th scope="col">Total routing score</th><th scope="col">4.2 vs. proposal</th></tr>
+          </thead>
+          <tbody id="responder-scores"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <details id="presenter-notes">
+      <summary>Presenter notes</summary>
+      <p><strong>What happened after 4.2.</strong> The release shortened the response window from 90 to 60 seconds and increased the weight of travel time in ranking. An expired ping still deducted 0.12 from acceptance history, exactly like an explicit decline, with no automatic recovery. This creates a feedback loop where missing an offer can lower someone’s rank and reduce future offers. In equal 21-day windows excluding release day, acceptance fell from 77.5% to 62.4%, misses rose from 12 to 91, and unaccepted callouts rose from 23/430 to 44/345. Farlight’s weekly pings fell from 11–13 to 3, 1 and 0. The data and code establish the pattern and mechanism, but missing delivery timestamps and candidate ranks prevent us from isolating the contribution of each release change.</p>
+      <ol class="note-flow" aria-label="Missed offer under 4.2">
+        <li><span class="step">Offer expires after 60 seconds</span></li>
+        <li><span aria-hidden="true">→</span><span class="step score-step">Acceptance score drops by 0.12</span></li>
+        <li><span aria-hidden="true">→</span><span class="step">Dispatch tries the next responder</span></li>
+        <li><span aria-hidden="true">→</span><span class="step">Lower score can reduce future offers</span></li>
+      </ol>
+      <p><strong>What the proposal addresses.</strong> Preserve acceptance history when an offer expires, while continuing to the next responder. This prevents that miss from lowering the responder’s rank on later callouts. Kip sees separate expired, offered, accepted and unassigned events, and Farlight sees when an offer has ended. The roster explains the ranking inputs to Helen. In the illustrative second callout, preserving Farlight’s 0.84 acceptance score produces a total of 0.840, ahead of Cindermark’s 0.820. Applying the current miss penalty produces 0.810 and puts Farlight behind. Future offers still depend on availability, travel time and skills. Recovery for already-low scores and notification delivery need separate decisions.</p>
+      <ol class="note-flow" aria-label="Missed offer under the proposal">
+        <li><span class="step">Offer expires after 60 seconds</span></li>
+        <li><span aria-hidden="true">→</span><span class="step score-step">Acceptance score stays the same</span></li>
+        <li><span aria-hidden="true">→</span><span class="step">Dispatch tries the next responder</span></li>
+        <li><span aria-hidden="true">→</span><span class="step">Future ranking uses the preserved score</span></li>
+      </ol>
+      <p><strong>How we will judge success.</strong> First, validate that handlers can correctly explain where a callout went and responders understand the expired-offer state. Before a release trial, agree with Helen, Wen and Ravi on targets and a comparison design, using a control group where feasible. Capture candidate ranks, availability, delivery timing and each ping’s outcome. Verify that misses preserve scores and explicit declines deduct 0.12. Compare weekly first-offer share and pings per available hour for responders who miss offers, alongside acceptance rate, misses and declines separately, unaccepted-callout rate and median time to assignment. Success means fewer responders lose future opportunities after misses, fewer callouts remain unaccepted, and assignment speed stays within the agreed limit. Review responder-level results as well as the overall average. A rise in acceptance alone would leave the quiet-responder problem unresolved.</p>
+      <p>Ask Helen to approve a walkthrough with handlers and responders before any routing change. Choose Accept, Missed or Decline on any callout. Open the next callout to carry the score forward, or restart to return to 0.84. If someone ranks ahead of Farlight on a later callout, their simulated offer expires so you can still demo Farlight’s response.</p>
+      <p>The second callout uses equal travel-time and skill-match inputs for both responders. Farlight starts at 0.84 and Cindermark at 0.76. Under 4.2, the miss lowers Farlight to 0.72, so Cindermark ranks first. Under the proposal, Farlight stays at 0.84 and ranks first. These are illustrative values, with Cindermark’s score held fixed for the comparison.</p>
+      <p>The prototype keeps the 60-second window and current weights. An explicit decline still deducts 0.12. A responder who already starts at 0.00 stays there after a miss. Score recovery and notification delivery are outside the demo. Kip’s manual override behavior still needs to be confirmed.</p>
+    </details>
+  </main>
+
+  <script>
+    // Callout 2 assumptions: travel time in minutes, skill match, and starting acceptance.
+    const responders = [
+      { name: "Captain Vantage", area: "Hillcrest", minutes: 19, skills: 1, acceptance: 0.64 },
+      { name: "Cindermark", area: "Mill District", minutes: 9, skills: 1, acceptance: 0.76 },
+      { name: "Corporal Ashgrove", area: "Northfield", minutes: 24, skills: 0.5, acceptance: 0.58 },
+      { name: "Farlight", area: "Uptown", minutes: 9, skills: 1, acceptance: 0.84 },
+      { name: "Halfmoon", area: "Westbury", minutes: 27, skills: 0.5, acceptance: 0.50 },
+      { name: "Ironvale", area: "Riverside", minutes: 21, skills: 1, acceptance: 0.56 },
+      { name: "Meteor Mite", area: "Eastgate", minutes: 17, skills: 1, acceptance: 0.70 },
+      { name: "Nightwell", area: "Midtown", minutes: 13, skills: 0.5, acceptance: 0.68 },
+      { name: "Sgt. Bulwark", area: "Foundry Row", minutes: 30, skills: 1, acceptance: 0.62 },
+      { name: "Sgt. Falkirk", area: "Kingsbridge", minutes: 15, skills: 1, acceptance: 0.50 },
+      { name: "Stormwrack", area: "Southport", minutes: 38, skills: 0.5, acceptance: 0.48 },
+      { name: "The Drift", area: "Greenway", minutes: 23, skills: 0.5, acceptance: 0.60 },
+      { name: "The Gale", area: "Eastgate", minutes: 16, skills: 1, acceptance: 0.72 },
+      { name: "The Longcast", area: "Lakeshore", minutes: 33, skills: 0.5, acceptance: 0.56 },
+      { name: "The Undertow", area: "Harborside", minutes: 46, skills: 0, acceptance: 0.52 },
+      { name: "Vesper", area: "Old Town", minutes: 18, skills: 0.5, acceptance: 0.66 }
+    ];
+
+    const responseControls = document.getElementById("response-controls");
+    const acceptButton = document.getElementById("accept");
+    const missButton = document.getElementById("miss");
+    const declineButton = document.getElementById("decline");
+    const nextButton = document.getElementById("next");
+    const noBackupButton = document.getElementById("no-backup");
+    const restartButton = document.getElementById("restart");
+    const outcomes = {
+      accepted: { label: "Accepted", change: 0.08, title: "Callout accepted", message: "You’re assigned to the Uptown callout." },
+      missed: { label: "Missed", change: 0, title: "This offer has ended", message: "The response window closed before Dispatch received an answer." },
+      declined: { label: "Declined", change: -0.12, title: "Callout declined", message: "Dispatch will move to the next available responder." }
+    };
+    const startingScores = Object.fromEntries(responders.map(responder => [responder.name, responder.acceptance]));
+    let acceptanceScores;
+    let releaseScores;
+    let callout;
+    let offerOrder;
+    let events;
+    let response;
+    let responseStart;
+    let resolved;
+    let responderView = false;
+    const handlerViewButton = document.getElementById("handler-view");
+    const responderViewButton = document.getElementById("responder-view");
+    const phoneActions = document.getElementById("phone-actions");
+    const handlerPanels = ["handler-panel", "demo-controls", "roster-panel", "presenter-notes"]
+      .map(id => document.getElementById(id));
+
+    function selectView(showResponder) {
+      responderView = showResponder;
+      handlerViewButton.setAttribute("aria-pressed", String(!showResponder));
+      responderViewButton.setAttribute("aria-pressed", String(showResponder));
+      document.getElementById("demo-grid").classList.toggle("responder-view", showResponder);
+      handlerPanels.forEach(panel => { panel.hidden = showResponder; });
+      render(false);
+    }
+
+    function updateScores(name, outcome) {
+      const change = outcomes[outcome].change;
+      acceptanceScores[name] = Math.min(1, Math.max(0, acceptanceScores[name] + change));
+      const releaseChange = outcome === "missed" ? outcomes.declined.change : change;
+      releaseScores[name] = Math.min(1, Math.max(0, releaseScores[name] + releaseChange));
+    }
+
+    function rankedRoster() {
+      return responders.map(responder => {
+        const proximity = Math.max(0, 1 - responder.minutes / 45);
+        const acceptance = acceptanceScores[responder.name];
+        const base = 0.60 * proximity + 0.15 * responder.skills;
+        const releaseAcceptance = releaseScores[responder.name];
+        return {
+          ...responder, proximity, acceptance, releaseAcceptance,
+          total: base + 0.25 * acceptance,
+          releaseTotal: base + 0.25 * releaseAcceptance
+        };
+      }).sort((a, b) => b.total - a.total);
+    }
+
+    function scoreComparison(score, expanded) {
+      const details = document.createElement("details");
+      details.className = "score-comparison";
+      details.dataset.responder = score.name;
+      details.open = expanded;
+      const summary = document.createElement("summary");
+      summary.textContent = "Compare scores";
+      summary.setAttribute("aria-label", "Compare scores for " + score.name);
+      details.appendChild(summary);
+      const metrics = [
+        ["Acceptance score", score.releaseAcceptance, score.acceptance, 2],
+        ["Routing score", score.releaseTotal, score.total, 3]
+      ];
+      for (const [label, release, proposal, decimals] of metrics) {
+        const figure = document.createElement("figure");
+        const caption = document.createElement("figcaption");
+        caption.textContent = label;
+        figure.appendChild(caption);
+        for (const [rule, value] of [["4.2", release], ["Proposal", proposal]]) {
+          const bar = document.createElement("div");
+          bar.className = "comparison-bar";
+          const ruleLabel = document.createElement("span");
+          ruleLabel.textContent = rule;
+          const track = document.createElement("span");
+          track.className = "bar-track";
+          track.setAttribute("aria-hidden", "true");
+          const fill = document.createElement("span");
+          fill.className = rule === "4.2" ? "bar-fill" : "bar-fill proposal";
+          fill.style.width = (value * 100) + "%";
+          track.appendChild(fill);
+          const number = document.createElement("span");
+          number.textContent = value.toFixed(decimals);
+          bar.append(ruleLabel, track, number);
+          figure.appendChild(bar);
+        }
+        details.appendChild(figure);
+      }
+      return details;
+    }
+
+    function renderScores(scores) {
+      const roster = document.getElementById("responder-scores");
+      const expanded = new Set(Array.from(roster.querySelectorAll("details[open]"), detail => detail.dataset.responder));
+      const rows = scores.map((score, index) => {
+        const row = document.createElement("tr");
+        const values = [
+          index + 1, score.name, score.area,
+          score.proximity.toFixed(2), score.skills.toFixed(2),
+          score.acceptance.toFixed(2), score.total.toFixed(3)
+        ];
+        values.forEach((value, column) => {
+          const cell = document.createElement(column === 1 ? "th" : "td");
+          if (column === 1) {
+            cell.scope = "row";
+            const identity = document.createElement("span");
+            identity.className = "responder-identity";
+            const avatar = document.createElement("img");
+            avatar.className = "avatar";
+            avatar.alt = "";
+            const slug = score.name.toLowerCase().replaceAll(".", "").replaceAll(" ", "-");
+            avatar.src = "avatars/" + slug + ".png";
+            const name = document.createElement("span");
+            name.textContent = value;
+            identity.appendChild(avatar);
+            identity.appendChild(name);
+            cell.appendChild(identity);
+          } else {
+            cell.textContent = value;
+          }
+          row.appendChild(cell);
+        });
+        const comparison = document.createElement("td");
+        comparison.appendChild(scoreComparison(score, expanded.has(score.name)));
+        row.appendChild(comparison);
+        return row;
+      });
+      roster.replaceChildren(...rows);
+    }
+
+    function openCallout(moveFocus = true) {
+      callout += 1;
+      response = null;
+      resolved = false;
+      offerOrder = callout === 1 ? ["Farlight", "Sgt. Falkirk"] : rankedRoster().map(responder => responder.name);
+      const farlightIndex = offerOrder.indexOf("Farlight");
+      events = offerOrder.slice(0, farlightIndex).flatMap(name => {
+        updateScores(name, "missed");
+        return ["Offer sent to " + name, name + " · Simulated offer expired"];
+      });
+      events.push("Offer sent to Farlight");
+      render(moveFocus);
+    }
+
+    function recordResponse(outcome) {
+      if (response) return;
+      response = outcomes[outcome];
+      responseStart = acceptanceScores.Farlight;
+      updateScores("Farlight", outcome);
+      events.push("Farlight · " + (outcome === "missed" ? "Offer expired" : response.label));
+      resolved = outcome === "accepted";
+      if (resolved) events.push("Assigned to Farlight");
+      render();
+    }
+
+    function render(moveFocus = true) {
+      const incident = callout === 1 ? "Equipment assistance" : "Field assistance";
+      document.getElementById("callout").textContent = "Callout " + callout;
+      const incidentType = document.getElementById("incident-type");
+      if (incidentType) incidentType.textContent = incident;
+      document.getElementById("phone-title").textContent = response ? response.title : "Incoming callout";
+      document.getElementById("phone-message").textContent = response ? response.message : "Uptown · " + incident + " · 60 seconds to respond";
+
+      const scores = rankedRoster();
+      const score = acceptanceScores.Farlight.toFixed(2);
+      document.getElementById("score-summary").textContent = response
+        ? response.label + " · Farlight’s acceptance score: " + responseStart.toFixed(2) + " → " + score
+          + "." + (responderView ? "" : " " + scores[0].name + " ranks first for the next callout.")
+        : "Farlight’s acceptance score: " + score + ".";
+      renderScores(scores);
+      document.getElementById("timeline").replaceChildren(...events.map(event => {
+        const row = document.createElement("li");
+        row.textContent = event;
+        return row;
+      }));
+
+      const backup = offerOrder[offerOrder.indexOf("Farlight") + 1];
+      responseControls.hidden = Boolean(response);
+      phoneActions.hidden = !responderView || Boolean(response);
+      nextButton.hidden = !response || (!resolved && !backup);
+      nextButton.textContent = resolved ? "Open the next callout" : "Send the next offer";
+      noBackupButton.hidden = !response || resolved;
+      noBackupButton.textContent = backup ? "Simulate no backup for callout " + callout : "Mark callout unassigned";
+      if (moveFocus) {
+        const activeButton = !response ? acceptButton : nextButton.hidden ? noBackupButton : nextButton;
+        (responderView ? document.getElementById("phone-title") : activeButton).focus();
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+      if (resolved) {
+        openCallout();
+        return;
+      }
+      const backup = offerOrder[offerOrder.indexOf("Farlight") + 1];
+      events.push("Offer sent to " + backup, backup + " · Accepted", "Assigned to " + backup);
+      updateScores(backup, "accepted");
+      resolved = true;
+      render();
+    });
+    noBackupButton.addEventListener("click", () => {
+      events.push("Unassigned · No further responders available");
+      resolved = true;
+      render();
+    });
+    acceptButton.addEventListener("click", () => recordResponse("accepted"));
+    missButton.addEventListener("click", () => recordResponse("missed"));
+    declineButton.addEventListener("click", () => recordResponse("declined"));
+
+    function restart(moveFocus = true) {
+      acceptanceScores = { ...startingScores };
+      releaseScores = { ...startingScores };
+      document.getElementById("responder-scores").replaceChildren();
+      callout = 0;
+      openCallout(moveFocus);
+    }
+    restartButton.addEventListener("click", () => restart());
+    handlerViewButton.addEventListener("click", () => selectView(false));
+    responderViewButton.addEventListener("click", () => selectView(true));
+    document.getElementById("phone-accept").addEventListener("click", () => recordResponse("accepted"));
+    document.getElementById("phone-decline").addEventListener("click", () => recordResponse("declined"));
+    restart(false);
+  </script>
+</body>
+</html>
