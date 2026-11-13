@@ -55,10 +55,14 @@
     .score-comparison summary { white-space: nowrap; }
     .score-comparison figure { margin: 10px 0 0; }
     .score-comparison figcaption { margin-bottom: 4px; }
-    .comparison-bar { display: grid; grid-template-columns: 58px 1fr 44px; align-items: center; gap: 6px; margin: 4px 0; font-size: .8rem; }
-    .bar-track { height: 9px; background: var(--canvas); border-radius: 4px; overflow: hidden; }
-    .bar-fill { display: block; height: 100%; background: #56677b; }
-    .bar-fill.proposal { background: var(--red); }
+    .score-history { max-width: 360px; overflow-x: auto; }
+    .score-history svg { display: block; font-size: 11px; }
+    .score-grid { stroke: var(--line); }
+    .score-history .release { color: #56677b; }
+    .score-history .proposal { color: var(--red); }
+    .score-history polyline { fill: none; stroke: currentColor; stroke-width: 2; }
+    .score-history polyline.release { stroke-dasharray: 5 3; }
+    .score-history circle, .score-history text { fill: currentColor; }
     .note-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 14px 0 18px; padding: 0; list-style: none; }
     .note-flow li { display: flex; align-items: center; gap: 8px; padding: 0; font-size: .9rem; }
     .note-flow .step { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--canvas); }
@@ -124,7 +128,7 @@
     <details id="helen-walkthrough" open>
       <summary>Helen’s walkthrough</summary>
       <ol>
-        <li><strong>Miss and follow the next offer.</strong> Click <strong>Missed (60 seconds)</strong>. Kip sees the offer expire and Farlight’s phone shows that the offer ended. In the roster, expand Farlight’s <strong>Compare scores</strong> to see 4.2 drop to 0.72 while the proposal holds at 0.84. Click <strong>Send the next offer</strong>, then <strong>Open the next callout</strong> to see who gets offered Callout 2 first.</li>
+        <li><strong>Miss and follow the next offer.</strong> Click <strong>Missed (60 seconds)</strong>. Kip sees the offer expire and Farlight’s phone shows that the offer ended. In the roster, expand Farlight’s <strong>Score history</strong> to see 4.2 drop to 0.72 while the proposal holds at 0.84. Click <strong>Send the next offer</strong>, then <strong>Open the next callout</strong> to see who gets offered Callout 2 first.</li>
         <li><strong>Accept.</strong> Click <strong>Restart demo</strong>, then <strong>Accept</strong>. Kip sees the assignment and Farlight’s score rises from 0.84 to 0.92 under both rules.</li>
         <li><strong>Decline.</strong> Restart and click <strong>Decline</strong>. Farlight’s score falls from 0.84 to 0.72 under both rules. Kip sees the decline and can send the next offer.</li>
         <li><strong>Show the no-backup case.</strong> Restart, click <strong>Missed (60 seconds)</strong>, then <strong>Simulate no backup for callout 1</strong>. Kip sees <strong>Unassigned</strong> in the timeline.</li>
@@ -135,11 +139,11 @@
     <section class="scores" id="roster-panel" aria-labelledby="scores-heading">
       <h2 id="scores-heading">Uptown · Full responder roster</h2>
       <p>For each new callout after the first, this simulation makes all 16 rostered responders available again. Travel time, skills and acceptance scores are simulated.</p>
-      <p>Total = 60% proximity + 15% skills match + 25% acceptance history. Rows show how the current scores would rank responders for the next callout. Expand a comparison to see how 4.2 and the proposal score the same simulated offers on a 0–1 scale.</p>
+      <p>Total = 60% proximity + 15% skills match + 25% acceptance history. Rows show how the current scores would rank responders for the next callout. Expand Score history to compare simulated acceptance scores after each callout. Gray shows 4.2 and red shows the proposal.</p>
       <div class="table-scroll" tabindex="0" role="region" aria-labelledby="scores-heading">
         <table aria-labelledby="scores-heading">
           <thead>
-            <tr><th scope="col">Rank</th><th scope="col">Responder</th><th scope="col">Usual area</th><th scope="col">Proximity</th><th scope="col">Skills match</th><th scope="col">Acceptance score</th><th scope="col">Total routing score</th><th scope="col">4.2 vs. proposal</th></tr>
+            <tr><th scope="col">Rank</th><th scope="col">Responder</th><th scope="col">Usual area</th><th scope="col">Proximity</th><th scope="col">Skills match</th><th scope="col">Acceptance score</th><th scope="col">Total routing score</th><th scope="col">Scores over time</th></tr>
           </thead>
           <tbody id="responder-scores"></tbody>
         </table>
@@ -225,6 +229,7 @@
     let acceptanceScores;
     let releaseScores;
     let callout;
+    let scoreHistory;
     let offerOrder;
     let events;
     let response;
@@ -258,52 +263,60 @@
         const proximity = Math.max(0, 1 - responder.minutes / 45);
         const acceptance = acceptanceScores[responder.name];
         const base = 0.60 * proximity + 0.15 * responder.skills;
-        const releaseAcceptance = releaseScores[responder.name];
         return {
-          ...responder, proximity, acceptance, releaseAcceptance,
-          total: base + 0.25 * acceptance,
-          releaseTotal: base + 0.25 * releaseAcceptance
+          ...responder, proximity, acceptance,
+          total: base + 0.25 * acceptance
         };
       }).sort((a, b) => b.total - a.total);
     }
 
-    function scoreComparison(score, expanded) {
+    function scoreHistoryDetails(score, expanded) {
       const details = document.createElement("details");
       details.className = "score-comparison";
       details.dataset.responder = score.name;
       details.open = expanded;
       const summary = document.createElement("summary");
-      summary.textContent = "Compare scores";
-      summary.setAttribute("aria-label", "Compare scores for " + score.name);
+      summary.textContent = "Score history";
+      summary.setAttribute("aria-label", "Score history for " + score.name);
       details.appendChild(summary);
-      const metrics = [
-        ["Acceptance score", score.releaseAcceptance, score.acceptance, 2],
-        ["Routing score", score.releaseTotal, score.total, 3]
-      ];
-      for (const [label, release, proposal, decimals] of metrics) {
-        const figure = document.createElement("figure");
-        const caption = document.createElement("figcaption");
-        caption.textContent = label;
-        figure.appendChild(caption);
-        for (const [rule, value] of [["4.2", release], ["Proposal", proposal]]) {
-          const bar = document.createElement("div");
-          bar.className = "comparison-bar";
-          const ruleLabel = document.createElement("span");
-          ruleLabel.textContent = rule;
-          const track = document.createElement("span");
-          track.className = "bar-track";
-          track.setAttribute("aria-hidden", "true");
-          const fill = document.createElement("span");
-          fill.className = rule === "4.2" ? "bar-fill" : "bar-fill proposal";
-          fill.style.width = (value * 100) + "%";
-          track.appendChild(fill);
-          const number = document.createElement("span");
-          number.textContent = value.toFixed(decimals);
-          bar.append(ruleLabel, track, number);
-          figure.appendChild(bar);
-        }
-        details.appendChild(figure);
-      }
+      const figure = document.createElement("figure");
+      const caption = document.createElement("figcaption");
+      caption.textContent = "Acceptance score by callout";
+      const plot = document.createElement("div");
+      plot.className = "score-history";
+      plot.tabIndex = 0;
+      plot.setAttribute("role", "region");
+      plot.setAttribute("aria-label", "Score history for " + score.name);
+      const x = index => 54 + index * 54;
+      const y = score => 142 - score * 106;
+      const width = Math.max(205, x(scoreHistory.length - 1) + 32);
+      const ticks = [1, 0.75, 0.5, 0.25, 0];
+      const grid = ticks.map(value => `
+        <line class="score-grid" x1="32" x2="${width - 12}" y1="${y(value)}" y2="${y(value)}"/>
+        <text x="28" y="${y(value) + 4}" text-anchor="end">${value.toFixed(2)}</text>`).join("");
+      const callouts = scoreHistory.map((_, index) =>
+        `<text x="${x(index)}" y="171" text-anchor="middle">${index + 1}</text>`).join("");
+      const series = ["release", "proposal"].map(rule => {
+        const values = scoreHistory.map(snapshot => snapshot[rule][score.name]);
+        const points = values.map((value, index) => x(index) + "," + y(value)).join(" ");
+        const markers = values.map((value, index) => `
+          <circle cx="${x(index)}" cy="${y(value)}" r="${rule === "release" ? 4 : 2.5}"/>`).join("");
+        return `<g class="${rule}"><polyline class="${rule}" points="${points}"/>${markers}</g>`;
+      }).join("");
+      const labels = scoreHistory.map((snapshot, index) => `
+        <text class="release" x="${x(index)}" y="${y(snapshot.release[score.name]) + 15}" text-anchor="middle">${snapshot.release[score.name].toFixed(2)}</text>
+        <text class="proposal" x="${x(index)}" y="${y(snapshot.proposal[score.name]) - 9}" text-anchor="middle">${snapshot.proposal[score.name].toFixed(2)}</text>`).join("");
+      const description = scoreHistory.map((snapshot, index) =>
+        "Callout " + (index + 1) + ": 4.2 " + snapshot.release[score.name].toFixed(2)
+        + ", proposal " + snapshot.proposal[score.name].toFixed(2)).join(". ");
+      plot.innerHTML = `<svg width="${width}" height="195" role="img" aria-label="${description}">
+        <text class="release" x="40" y="13">4.2 (dashed)</text>
+        <text class="proposal" x="120" y="13">Proposal</text>
+        ${grid}${callouts}${series}${labels}
+        <text x="${width / 2}" y="190" text-anchor="middle">Callout</text>
+      </svg>`;
+      figure.append(caption, plot);
+      details.appendChild(figure);
       return details;
     }
 
@@ -339,7 +352,7 @@
           row.appendChild(cell);
         });
         const comparison = document.createElement("td");
-        comparison.appendChild(scoreComparison(score, expanded.has(score.name)));
+        comparison.appendChild(scoreHistoryDetails(score, expanded.has(score.name)));
         row.appendChild(comparison);
         return row;
       });
@@ -385,6 +398,7 @@
         ? response.label + " · Farlight’s acceptance score: " + responseStart.toFixed(2) + " → " + score
           + "." + (responderView ? "" : " " + scores[0].name + " ranks first for the next callout.")
         : "Farlight’s acceptance score: " + score + ".";
+      scoreHistory[callout - 1] = { release: { ...releaseScores }, proposal: { ...acceptanceScores } };
       renderScores(scores);
       document.getElementById("timeline").replaceChildren(...events.map(event => {
         const row = document.createElement("li");
@@ -430,6 +444,7 @@
       releaseScores = { ...startingScores };
       document.getElementById("responder-scores").replaceChildren();
       callout = 0;
+      scoreHistory = [];
       openCallout(moveFocus);
     }
     restartButton.addEventListener("click", () => restart());
