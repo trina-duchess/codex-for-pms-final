@@ -24,6 +24,12 @@ prompt library built from your own questions.
 
 ### 1.
 
+Make a process diagram of how rook dispatch works?
+
 ### 2.
 
+Is there something missing from Priya's note that I need to know?
+
 ### 3.
+
+how does routing treat responders who decline jobs?
