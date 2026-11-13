@@ -78,3 +78,8 @@ Sources: Rook wiki **Company** section (product pages, glossary, team directory,
 - The demo starts Farlight at 0.84 and carries scores across callouts. Kip’s timeline and Farlight’s phone share the same callout. Each roster row compares how 4.2 and the proposal score the same simulated offers.
 - The Rook responder roster lists 16 responders and shows Farlight as the only responder whose usual area is Uptown. Eligibility depends on availability in the callout’s region at that moment. The prototype’s availability, travel times, skill matches and scores are illustrative.
 - Before a trial, agree on targets for first-offer share and pings per available hour after a miss, plus unaccepted callouts and time to assignment. Candidate ranks, availability and delivery timing are needed to evaluate the effect. Recovery for already-low scores remains open.
+
+- Module 6 created the project-local review-checklist skill. It checks for a named owner, a success measure, consistent scope and a problem statement before the fix.
+- The director brief passes all four checks after naming Helen Achebe to lead the walkthrough and report its findings. Wen Li advises on offer order and Ravi Menon on event capture and trial measures.
+- Helen’s offline walkthrough covers Accept, Miss, Decline and no available backup. The JavaScript smoke test verified the simulated outcomes, including a miss leaving Farlight at 0.84 under the proposal versus 0.72 under 4.2.
+- The skill now calls for setting regional trial criteria before launch and reviewing early results daily. Ravi flags changes in the metrics, Nadia surfaces support reports and Marcus traces affected callouts. Numerical thresholds remain open.

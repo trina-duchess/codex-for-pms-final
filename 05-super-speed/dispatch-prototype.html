@@ -88,6 +88,7 @@
         <h2 id="console-heading" class="identity"><img class="avatar" src="avatars/kip.png" alt="">Kip</h2>
         <div aria-live="polite">
           <h3 id="callout"></h3>
+          <p>Uptown · <span id="incident-type"></span></p>
           <ol id="timeline"></ol>
         </div>
         <div id="response-controls" class="controls" role="group" aria-label="Simulate Farlight’s response" hidden>
@@ -119,6 +120,17 @@
       <button id="no-backup" type="button" hidden>Simulate no backup for callout 1</button>
       <button id="restart" type="button">Restart demo</button>
     </div>
+
+    <details id="helen-walkthrough" open>
+      <summary>Helen’s walkthrough</summary>
+      <ol>
+        <li><strong>Miss and follow the next offer.</strong> Click <strong>Missed (60 seconds)</strong>. Kip sees the offer expire and Farlight’s phone shows that the offer ended. In the roster, expand Farlight’s <strong>Compare scores</strong> to see 4.2 drop to 0.72 while the proposal holds at 0.84. Click <strong>Send the next offer</strong>, then <strong>Open the next callout</strong> to see who gets offered Callout 2 first.</li>
+        <li><strong>Accept.</strong> Click <strong>Restart demo</strong>, then <strong>Accept</strong>. Kip sees the assignment and Farlight’s score rises from 0.84 to 0.92 under both rules.</li>
+        <li><strong>Decline.</strong> Restart and click <strong>Decline</strong>. Farlight’s score falls from 0.84 to 0.72 under both rules. Kip sees the decline and can send the next offer.</li>
+        <li><strong>Show the no-backup case.</strong> Restart, click <strong>Missed (60 seconds)</strong>, then <strong>Simulate no backup for callout 1</strong>. Kip sees <strong>Unassigned</strong> in the timeline.</li>
+      </ol>
+      <p><strong>Decision for Helen.</strong> Does the walkthrough show where the callout went and what a miss does to Farlight’s next opportunity? Before a trial, confirm the offer order with Wen and agree with Ravi on a first-offer share target and limits for assignment time and unassigned callouts.</p>
+    </details>
 
     <section class="scores" id="roster-panel" aria-labelledby="scores-heading">
       <h2 id="scores-heading">Uptown · Full responder roster</h2>
@@ -203,7 +215,7 @@
     const handlerViewButton = document.getElementById("handler-view");
     const responderViewButton = document.getElementById("responder-view");
     const phoneActions = document.getElementById("phone-actions");
-    const handlerPanels = ["handler-panel", "demo-controls", "roster-panel", "presenter-notes"]
+    const handlerPanels = ["handler-panel", "demo-controls", "roster-panel", "helen-walkthrough", "presenter-notes"]
       .map(id => document.getElementById(id));
 
     function selectView(showResponder) {

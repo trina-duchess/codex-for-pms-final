@@ -6,6 +6,8 @@
 
 **Decision requested.** Approve a walkthrough of two consecutive callouts before Engineering changes routing. When Farlight’s ping expires, Dispatch should still move to the next responder, while preserving Farlight’s acceptance score for the next callout. An explicit decline still deducts 0.12.
 
+Helen Achebe will lead the walkthrough and report its findings.
+
 ### What changes for Farlight and Kip
 
 | Moment | Kip at the console | Farlight on the phone |
