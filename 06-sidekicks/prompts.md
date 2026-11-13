@@ -74,3 +74,47 @@ Add each of these steps to the skill so they are automatically followed
 ### 15.
 
 Prototype of a walkthrough for Helen
+
+### 16.
+
+modify this section of the prototype so it shows a histogram of the calls over time
+
+### 17.
+
+This doesn't tell me anything.  It is just 1s across the top.  Need to go to 2 decimal places.
+
+### 18.
+
+Make it a line graph versus a histograph.  Attached is an example
+
+### 19.
+
+make this section a visually stunning process flow diagram 
+
+### 20.
+
+why is this empty?  what prompts did I use in Module 1?
+
+### 21.
+
+Hide that section in the presentation.  Don't need to know that exact prompts were unavailable.
+
+### 22.
+
+In the prototye, explain what the two lines mean?
+
+### 23.
+
+for the presentation, I would like a section which shows a set of calls for Farlight based on the 4.2 release and the proposed release.  Give a nice, line graph visual of the benefits of the proposal released.  Create a list of responses which will give the best visual.  
+
+### 24.
+
+redo it using the actual calls Farlight had before the release and after.  One line for the actual results, a second line for what the results would be if the proposed changes were in place
+
+### 25.
+
+add the calls results the bottom of the graph to show what happened to make the score go up and down
+
+### 26.
+
+Instead of crunching the graph in the right column of the table, put it as a row under each responders scores so it is the length of the table

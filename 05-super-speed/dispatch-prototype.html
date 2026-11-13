@@ -55,8 +55,10 @@
     .score-comparison summary { white-space: nowrap; }
     .score-comparison figure { margin: 10px 0 0; }
     .score-comparison figcaption { margin-bottom: 4px; }
-    .score-history { max-width: 360px; overflow-x: auto; }
-    .score-history svg { display: block; font-size: 11px; }
+    .score-history { overflow-x: auto; }
+    .history-row td { padding-top: 4px; padding-bottom: 12px; }
+    .score-comparison p { font-weight: 400; }
+    .score-history svg { display: block; width: 100%; height: auto; font-size: 13px; }
     .score-grid { stroke: var(--line); }
     .score-history .release { color: #56677b; }
     .score-history .proposal { color: var(--red); }
@@ -143,7 +145,7 @@
       <div class="table-scroll" tabindex="0" role="region" aria-labelledby="scores-heading">
         <table aria-labelledby="scores-heading">
           <thead>
-            <tr><th scope="col">Rank</th><th scope="col">Responder</th><th scope="col">Usual area</th><th scope="col">Proximity</th><th scope="col">Skills match</th><th scope="col">Acceptance score</th><th scope="col">Total routing score</th><th scope="col">Scores over time</th></tr>
+            <tr><th scope="col">Rank</th><th scope="col">Responder</th><th scope="col">Usual area</th><th scope="col">Proximity</th><th scope="col">Skills match</th><th scope="col">Acceptance score</th><th scope="col">Total routing score</th></tr>
           </thead>
           <tbody id="responder-scores"></tbody>
         </table>
@@ -268,9 +270,10 @@
       plot.tabIndex = 0;
       plot.setAttribute("role", "region");
       plot.setAttribute("aria-label", "Score history for " + score.name);
-      const x = index => 54 + index * 54;
+      const width = Math.max(760, 100 + (scoreHistory.length - 1) * 54);
+      const step = (width - 100) / Math.max(1, scoreHistory.length - 1);
+      const x = index => 54 + index * step;
       const y = score => 142 - score * 106;
-      const width = Math.max(205, x(scoreHistory.length - 1) + 32);
       const ticks = [1, 0.75, 0.5, 0.25, 0];
       const grid = ticks.map(value => `
         <line class="score-grid" x1="32" x2="${width - 12}" y1="${y(value)}" y2="${y(value)}"/>
@@ -290,13 +293,18 @@
       const description = scoreHistory.map((snapshot, index) =>
         "Callout " + (index + 1) + ": 4.2 " + snapshot.release[score.name].toFixed(2)
         + ", proposal " + snapshot.proposal[score.name].toFixed(2)).join(". ");
-      plot.innerHTML = `<svg width="${width}" height="195" role="img" aria-label="${description}">
+      plot.innerHTML = `<svg viewBox="0 0 ${width} 195" width="${width}" height="195" style="min-width: ${Math.max(560, 100 + (scoreHistory.length - 1) * 54)}px" role="img" aria-label="${description}">
         <text class="release" x="40" y="13">4.2 (dashed)</text>
         <text class="proposal" x="120" y="13">Proposal</text>
         ${grid}${callouts}${series}${labels}
         <text x="${width / 2}" y="190" text-anchor="middle">Callout</text>
       </svg>`;
-      figure.append(caption, plot);
+      const explanation = document.createElement("p");
+      explanation.textContent = "Each point shows this responder's acceptance score at that point in the same simulated callout sequence. "
+        + "Dashed gray (4.2): a miss or decline deducts 0.12. "
+        + "Solid red (proposal): a miss leaves the score unchanged and a decline deducts 0.12. "
+        + "An acceptance adds 0.08 under both rules, up to 1.00.";
+      figure.append(caption, plot, explanation);
       details.appendChild(figure);
       return details;
     }
@@ -304,7 +312,7 @@
     function renderScores(scores) {
       const roster = document.getElementById("responder-scores");
       const expanded = new Set(Array.from(roster.querySelectorAll("details[open]"), detail => detail.dataset.responder));
-      const rows = scores.map((score, index) => {
+      const rows = scores.flatMap((score, index) => {
         const row = document.createElement("tr");
         const values = [
           index + 1, score.name, score.area,
@@ -332,10 +340,13 @@
           }
           row.appendChild(cell);
         });
-        const comparison = document.createElement("td");
-        comparison.appendChild(scoreHistoryDetails(score, expanded.has(score.name)));
-        row.appendChild(comparison);
-        return row;
+        const historyRow = document.createElement("tr");
+        historyRow.className = "history-row";
+        const historyCell = document.createElement("td");
+        historyCell.colSpan = values.length;
+        historyCell.appendChild(scoreHistoryDetails(score, expanded.has(score.name)));
+        historyRow.appendChild(historyCell);
+        return [row, historyRow];
       });
       roster.replaceChildren(...rows);
     }

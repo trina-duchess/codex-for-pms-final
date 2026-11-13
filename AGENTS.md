@@ -83,3 +83,8 @@ Sources: Rook wiki **Company** section (product pages, glossary, team directory,
 - The director brief passes all four checks after naming Helen Achebe to lead the walkthrough and report its findings. Wen Li advises on offer order and Ravi Menon on event capture and trial measures.
 - Helen’s offline walkthrough covers Accept, Miss, Decline and no available backup. The JavaScript smoke test verified the simulated outcomes, including a miss leaving Farlight at 0.84 under the proposal versus 0.72 under 4.2.
 - The skill now calls for setting regional trial criteria before launch and reviewing early results daily. Ravi flags changes in the metrics, Nadia surfaces support reports and Marcus traces affected callouts. Numerical thresholds remain open.
+
+- The final report presents evidence from all six modules and embeds the offline Dispatch prototype. The Module 1 prompt slots are still empty.
+- The Farlight replay uses 86 recorded offers, 75 before August 12 and 11 from release day onward. The score reconstructed from recorded outcomes fell from 0.84 at release to 0.00. Applying the proposal from August 12 to the same outcomes ends at 0.76.
+- The replay holds offers and responses fixed. Changes to future offer volume and assignment outcomes still need a trial. The report aligns recorded outcomes beneath the score chart.
+- The prototype shows each responder's two score lines in an expandable full-width row under their scores.
